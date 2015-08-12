@@ -512,7 +512,7 @@ def connect(iface, essid, encrypt='off', seckey=None, wpa_custom_file=None):
     if wpa_custom_file:
         logger.info("Starting wpa_supplicant with custom config: %s" % wpa_custom_file)
         # wpa_supplicant might complain even if it goes ahead doing its job
-        run_cmd("wpa_supplicant -Dnl80211 -t -d -c%s -i%s -f /var/log/kano_wpa.log -B" % (wpa_custom_file, iface))
+        run_cmd("wpa_supplicant -Dnl80211,wext -t -d -c%s -i%s -f /var/log/kano_wpa.log -B" % (wpa_custom_file, iface))
 
     elif encrypt == 'wep':
 
@@ -534,7 +534,7 @@ def connect(iface, essid, encrypt='off', seckey=None, wpa_custom_file=None):
                 return False
         elif len(seckey) not in (10+3, 26+3, 116+3):
             # For keys that start with "hex", make sure their length is also correct.
-            logger.error("The HEX WEP key lenght is incorrect (%d) should 10/26/116" % (len(seckey)))
+            logger.error("The HEX WEP key length is incorrect (%d) should 10/26/116" % (len(seckey)))
             return False
 
         logger.info("Starting wpa_supplicant for WEP network '%s' to interface %s" % (essid, iface))
@@ -544,12 +544,12 @@ def connect(iface, essid, encrypt='off', seckey=None, wpa_custom_file=None):
             return False
 
         # wpa_supplicant might complain even if it goes ahead doing its job
-        run_cmd("wpa_supplicant -Dnl80211 -t -d -c%s -i%s -f /var/log/kano_wpa.log -B" % (wpafile, iface))
+        run_cmd("wpa_supplicant -Dnl80211,wext -t -d -c%s -i%s -f /var/log/kano_wpa.log -B" % (wpafile, iface))
 
         # Wait for wpa_supplicant to become associated to the AP - key validation.
         # For WEP Open networks it will always proceed, beacuse there is no real authentication,
         # connection will fail during DHCP process. For WEP Shared networks it will fail here if the key is wrong.
-        assoc_timeout = 20  # seconds
+        assoc_timeout = 40  # seconds
         assoc_start = time.time()
         while (time.time() - assoc_start) < assoc_timeout:
             out, _, _ = run_cmd('wpa_cli -p /var/run/wpa_supplicant/ status|grep wpa_state')
@@ -568,7 +568,7 @@ def connect(iface, essid, encrypt='off', seckey=None, wpa_custom_file=None):
             wpalen=len(seckey)
             if wpalen < 8 or wpalen > 63:
                 # WPA passphrases lenght is not correct
-                logger.error("The WPA key lenght is incorrect " \
+                logger.error("The WPA key length is incorrect " \
                                  "(%d) should be between 8 and 63 chars" % wpalen)
                 return False
 
@@ -579,11 +579,11 @@ def connect(iface, essid, encrypt='off', seckey=None, wpa_custom_file=None):
             return False
 
         # wpa_supplicant might complain even if it goes ahead doing its job
-        run_cmd("wpa_supplicant -Dnl80211 -t -d -c%s -i%s -f /var/log/kano_wpa.log -B" % (wpafile, iface))
+        run_cmd("wpa_supplicant -Dnl80211,wext -t -d -c%s -i%s -f /var/log/kano_wpa.log -B" % (wpafile, iface))
 
         # Wait for wpa_supplicant to become associated to the AP
         # or give up if it takes too long
-        assoc_timeout = 20  # seconds
+        assoc_timeout = 40  # seconds
         assoc_start = time.time()
         while (time.time() - assoc_start) < assoc_timeout:
             out, _, _ = run_cmd('wpa_cli -p /var/run/wpa_supplicant/ status|grep wpa_state')
