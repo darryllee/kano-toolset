@@ -221,8 +221,11 @@ class IWList():
         '''
 
         def sortNetworks(adict):
-            x, z = adict['quality'].split('/')
-            factor = int(x) / float(z)
+            if adict['quality'] != '':
+                x, z = adict['quality'].split('/')
+                factor = int(x) / float(z)
+            else:
+                factor = 0
             return factor
 
         def add_wnet(wlist, new_wnet):
