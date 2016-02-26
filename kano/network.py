@@ -237,7 +237,7 @@ class IWList():
                 x, z = adict['quality'].split('/')
                 factor = int(x) / float(z)
             else:
-                factor = int(adict['quality']) / 100
+                factor = float(int(adict['quality'])) / 100
             return factor
 
         def add_wnet(wlist, new_wnet):
