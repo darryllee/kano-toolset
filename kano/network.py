@@ -131,7 +131,7 @@ class IWList():
                 return s.strip().split(":")[1]
 
             def getCellSignal(s):
-                s = s.split("Signal level=")[1]
+                s = re.split('Signal level(=|:)', s)[2]
                 return s.strip().split(" ")[0]
 
             def getCellNoise(s):
@@ -142,7 +142,7 @@ class IWList():
                     return 0
 
             def getCellQuality(s):
-                s = s.split("=")[1]
+                s = re.split('(=|:)', s)[2]
                 return s.strip().split(" ")[0]
 
             def getCellMAC(s):
@@ -177,7 +177,7 @@ class IWList():
                 if s.strip().startswith("Frequency:"):
                     cellData["Frequency"] = getCellFrequency(s)
                     cellData["Channel"] = getCellChannel(s)
-                if s.strip().startswith("Quality="):
+                if s.strip().startswith("Quality"):
                     cellData["Quality"] = getCellQuality(s)
                     cellData["Signal"] = getCellSignal(s)
                     cellData["Noise"] = getCellNoise(s)
@@ -233,8 +233,11 @@ class IWList():
         '''
 
         def sortNetworks(adict):
-            x, z = adict['quality'].split('/')
-            factor = int(x) / float(z)
+            if '/' in adict['quality']:
+                x, z = adict['quality'].split('/')
+                factor = int(x) / float(z)
+            else:
+                factor = int(adict['quality']) / 100
             return factor
 
         def add_wnet(wlist, new_wnet):
